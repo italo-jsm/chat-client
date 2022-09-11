@@ -34,7 +34,7 @@ func ReceiveMessage(messagePayload string){
 
 func getPrivateKey() *rsa.PrivateKey{
 	//buscar chave privada no storage local
-	b, _ := ioutil.ReadFile("privateKey.txt")
+	b, _ := ioutil.ReadFile("user-data/privateKey.txt")
 	//montar chave privada
 	bytes, err := base64.StdEncoding.DecodeString(string(b))
 	if(err != nil){

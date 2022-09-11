@@ -10,7 +10,7 @@ import (
 
 func CreateUser(username string, email string){
 	publicKey, privateKey := utils.GenerateKeyPair()
-	os.WriteFile("privateKey.txt", []byte(privateKey), 0755)
+	os.WriteFile("user-data/privateKey.txt", []byte(privateKey), 0755)
 	user := User{
 		Username: username,
 		Email: email,
