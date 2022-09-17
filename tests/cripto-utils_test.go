@@ -14,3 +14,13 @@ func TestEncryptAndDecriptString(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestEncryptReturnsDiferentResults(t *testing.T) {
+	publicKey, _ := utils.GenerateKeyPair()
+	stringTest := "Palavras de Teste"
+	encrypted1 := utils.EncryptString(stringTest, *utils.GetPublicKeyFromString(publicKey))
+	encrypted2 := utils.EncryptString(stringTest, *utils.GetPublicKeyFromString(publicKey))
+	if(encrypted1 == encrypted2){
+		t.Fail()
+	}
+}
