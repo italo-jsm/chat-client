@@ -41,3 +41,27 @@ func GenerateKeyPair() (string, string){
 
 	return pubString, privString
 }
+
+func GetPublicKeyFromString(publicKeyString string) *rsa.PublicKey{
+	bytes, err := base64.StdEncoding.DecodeString(publicKeyString)
+	if(err != nil){
+		panic(err.Error())
+	}
+	publicKey, err2 := x509.ParsePKCS1PublicKey(bytes)
+	if(err2 != nil){
+		panic(err2.Error())
+	}
+	return publicKey
+}
+
+func GetPrivateKeyFromString(stringPrivateKey string) *rsa.PrivateKey{
+	bytes, err := base64.StdEncoding.DecodeString(stringPrivateKey)
+	if(err != nil){
+		panic(err.Error())
+	}
+	privateKey, err2 := x509.ParsePKCS1PrivateKey(bytes)
+	if(err2 != nil){
+		panic(err2.Error())
+	}
+	return privateKey
+}

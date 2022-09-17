@@ -5,11 +5,10 @@ import (
 	"chat-client/users"
 	"chat-client/utils"
 	"crypto/rsa"
-	"crypto/x509"
-	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 func SendMessage(destinationId string, messagePayload string){
@@ -24,40 +23,34 @@ func SendMessage(destinationId string, messagePayload string){
 		Payload: encryptedMessage,
 	}
 	r, _ := json.Marshal(message)
-	http.Post("http://localhost:3000/messages", "application/json", bytes.NewBuffer(r))
+	host := os.Getenv("CHAT_HOST")
+	http.Post(host + "/messages", "application/json", bytes.NewBuffer(r))
 }
 
-func ReceiveMessage(messagePayload string){
+func GetMessagePaload(messagePayload string) string{
 	msg := utils.DecodeBase64String(messagePayload, *getPrivateKey())
-	println(msg)
+	return msg
 }
 
 func getPrivateKey() *rsa.PrivateKey{
-	//buscar chave privada no storage local
 	b, _ := ioutil.ReadFile("user-data/privateKey.txt")
-	//montar chave privada
-	bytes, err := base64.StdEncoding.DecodeString(string(b))
-	if(err != nil){
-		panic(err.Error())
-	}
-	privateKey, err2 := x509.ParsePKCS1PrivateKey(bytes)
-	if(err2 != nil){
-		panic(err2.Error())
-	}
-	return privateKey
+	return utils.GetPrivateKeyFromString(string(b))
 }
 
 func getDestinationPublicKey(destinationId string) *rsa.PublicKey{
-	//chamar o servico de mensagens e obter o usuario
 	user := users.FindUserById(destinationId)
-	//montar chave publica
-	bytes, err := base64.StdEncoding.DecodeString(user.PublicKey)
+	return utils.GetPublicKeyFromString(user.PublicKey)
+}
+
+func GetUnreadMessages(userId string) []Message{
+	host := os.Getenv("CHAT_HOST")
+	r, err := http.Get( host + "/messages/unread/" + userId)
 	if(err != nil){
 		panic(err.Error())
 	}
-	publicKey, err2 := x509.ParsePKCS1PublicKey(bytes)
-	if(err2 != nil){
-		panic(err2.Error())
-	}
-	return publicKey
+	var messages []Message
+	defer r.Body.Close()
+
+	json.NewDecoder(r.Body).Decode(&messages)
+	return messages
 }

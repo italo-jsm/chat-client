@@ -17,11 +17,13 @@ func CreateUser(username string, email string){
 		PublicKey: publicKey,
 	}
 	r, _ := json.Marshal(user)
-	http.Post("http://localhost:3000/users", "application/json", bytes.NewBuffer(r))
+	host := os.Getenv("CHAT_HOST")
+	http.Post( host + "/users", "application/json", bytes.NewBuffer(r))
 }
 
 func FindUserById(userId string) User{
-	r, err := http.Get("http://localhost:3000/users/" + userId)
+	host := os.Getenv("CHAT_HOST")
+	r, err := http.Get( host + "/users/" + userId)
 	if(err != nil){
 		panic(err.Error())
 	}
